@@ -1,5 +1,4 @@
 # Unity Helper Functions
-=====
 
 A bunch of helper functions for Unity, written in C#. Note that this is a work in progress -- although most things have implementations, some only have a skeleton implementation. Full implementations and more complete code documentation will come later.
 
