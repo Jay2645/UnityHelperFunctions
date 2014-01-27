@@ -1,4 +1,4 @@
-﻿public static class GlobalConsts
+﻿public static partial class GlobalConsts
 {
 	/// <summary>
 	/// How long it takes to go in and out of a scene (plus loading times)
