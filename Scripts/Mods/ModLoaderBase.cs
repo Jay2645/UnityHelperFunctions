@@ -4,8 +4,17 @@ using System.IO;
 
 namespace ModSystem
 {
-	public static class ModLoader
+	public static partial class ModLoader
 	{
+		/// <summary>
+		/// Gets all custom fields from JSON for your mod. See LoadModJSON().
+		/// </summary>
+		static partial void LoadGameModJSON(string[] modDirectories);
+		/// <summary>
+		/// Overwrites the custom fields in your mod based on the load order. See SortMods().
+		/// </summary>
+		static partial void SortGameMods();
+
 		private static string dataDirectory;
 		private static bool loadedMods = false;
 		private static Mod[] mods;
@@ -17,8 +26,38 @@ namespace ModSystem
 				return;
 			}
 			dataDirectory = GlobalConsts.GetDataPath() + "/GameData/";
-			List<Mod> modList = new List<Mod>();
 			string[] modDirectories = Directory.GetDirectories(dataDirectory);
+
+			// Load JSON.
+			LoadModJSON(modDirectories);
+
+			// Re-organize the mod list to put the base game at the top
+			List<Mod> modList = new List<Mod>(mods);
+			int count = 1;
+			foreach (Mod m in modList)
+			{
+				// Load base game mod first, then anything else overwrites base game
+				if (m.modname == GlobalConsts.GAME_BASE_MOD_NAME)
+				{
+					mods[0] = m;
+				}
+				else
+				{
+					if (count == modList.Count && mods[0] == null)
+					{
+						count = 0;
+					}
+					mods[count] = m;
+					count++;
+				}
+			}
+
+
+			loadedMods = true;
+		}
+
+		private static void LoadModJSON(string[] modDirectories)
+		{
 			foreach (string modName in modDirectories)
 			{
 				if (new DirectoryInfo(modName).Name == "Localization")
@@ -41,27 +80,13 @@ namespace ModSystem
 				{
 					m.AddSprite(node);
 				}
-				modList.Add(m);
+				AddMod(m);
 			}
-			mods = new Mod[modList.Count];
-			int count = 1;
-			foreach (Mod m in modList)
-			{
-				// Load base game mod first, then anything else overwrites base game
-				if (m.modname == GlobalConsts.GAME_BASE_MOD_NAME)
-				{
-					mods[0] = m;
-				}
-				else
-				{
-					if (count == modList.Count && mods[0] == null)
-					{
-						count = 0;
-					}
-					mods[count] = m;
-					count++;
-				}
-			}
+			LoadGameModJSON(modDirectories);
+		}
+
+		private static void SortMods()
+		{
 			// This forces later-loaded mods to overwrite what is loaded in earlier mods.
 			for (int i = 0; i < mods.Length; i++)
 			{
@@ -85,7 +110,19 @@ namespace ModSystem
 					}
 				}
 			}
-			loadedMods = true;
+			// Do the same with any other custom fields in the mod.
+			SortGameMods();
+		}
+
+		private static void AddMod(Mod m)
+		{
+			if (mods == null)
+			{
+				mods = new Mod[0];
+			}
+			List<Mod> modList = new List<Mod>(mods);
+			modList.Add(m);
+			mods = modList.ToArray();
 		}
 
 		public static Mod[] GetMods()

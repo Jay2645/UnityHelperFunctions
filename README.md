@@ -36,7 +36,7 @@ A way to keep track of objects across loads and even after the user closes and r
 
 An uncategorized array of helpful classes. Among them are:
 
-* `BaseGlobals`, a partial class that serves as the "hub" for many of the other functions found in this package.
+* `GlobalsBase`, a partial class that serves as the "hub" for many of the other functions found in this package.
 * `Bounds2D`, a class attempting to recreate the 3D bounds class for 2D objects.
 * `MonoHelper`, a replacement for MonoBehaviour that handles things like JSON serialization and hash generation.
 * *Partially implemented:* `RoomSettings`, a way to generate scene-specific settings.

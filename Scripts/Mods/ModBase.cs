@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 namespace ModSystem
 {
-	public class Mod
+	public partial class Mod
 	{
 		public Mod(string name)
 		{
