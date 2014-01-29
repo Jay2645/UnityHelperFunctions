@@ -9,7 +9,7 @@ namespace ModSystem
 		/// <summary>
 		/// Gets all custom fields from JSON for your mod. See LoadModJSON().
 		/// </summary>
-		static partial void LoadGameModJSON(string[] modDirectories);
+		static partial void LoadGameModJSON(JSONNode output, Mod m);
 		/// <summary>
 		/// Overwrites the custom fields in your mod based on the load order. See SortMods().
 		/// </summary>
@@ -52,6 +52,7 @@ namespace ModSystem
 				}
 			}
 
+			SortMods();
 
 			loadedMods = true;
 		}
@@ -80,9 +81,9 @@ namespace ModSystem
 				{
 					m.AddSprite(node);
 				}
+				LoadGameModJSON(output, m);
 				AddMod(m);
 			}
-			LoadGameModJSON(modDirectories);
 		}
 
 		private static void SortMods()

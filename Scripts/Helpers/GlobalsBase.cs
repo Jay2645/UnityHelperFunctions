@@ -1,4 +1,5 @@
-﻿using Instancing;
+﻿using Commands;
+using Instancing;
 using LuaSystem;
 using SaveSystem;
 using System.Collections.Generic;
@@ -6,10 +7,16 @@ using UnityEngine;
 
 public partial class Globals : MonoHelper
 {
+	partial void Init();
+
 	public static Globals instance
 	{
 		get
 		{
+			if (isClosing)
+			{
+				return null;
+			}
 			if (_instance == null)
 			{
 				// This finds a Globals object in our scene.
@@ -18,6 +25,7 @@ public partial class Globals : MonoHelper
 				if (globalGO == null)
 				{
 					globalGO = new GameObject("Globals");
+					globalGO.tag = "Globals";
 				}
 				_instance = globalGO.GetComponentInChildren<Globals>();
 				if (_instance == null)
@@ -32,15 +40,11 @@ public partial class Globals : MonoHelper
 	private static Globals _instance = null;
 
 	protected static bool hasInit = false;
+	private static bool isClosing = false;
 
 	#region Init
-	partial void Init();
 	protected void BaseInit()
 	{
-		if (hasInit)
-		{
-			return;
-		}
 		DontDestroy(this.gameObject);
 		inputController = gameObject.GetComponent<InputController>();
 		if (inputController == null)
@@ -54,7 +58,6 @@ public partial class Globals : MonoHelper
 		{
 			roomSettings = roomGlobals.GetComponent<RoomSettings>();
 		}
-		hasInit = true;
 	}
 	#endregion
 
@@ -104,6 +107,8 @@ public partial class Globals : MonoHelper
 	/// This contains a reference to the player.
 	/// </summary>
 	public static MonoHelper player = null;
+	public KeyCode[] keys;
+	public InputCommand[] actions;
 	#endregion
 
 	#region Instance Methods
@@ -183,6 +188,11 @@ public partial class Globals : MonoHelper
 		{
 			LuaManager.DoAllFiles();
 		}
+	}
+
+	void OnApplicationQuit()
+	{
+		isClosing = true;
 	}
 	#endregion
 	#endregion

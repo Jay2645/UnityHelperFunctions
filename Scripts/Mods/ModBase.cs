@@ -113,5 +113,10 @@ namespace ModSystem
 		{
 			return WillLoad(filename, sprites);
 		}
+
+		public override string ToString()
+		{
+			return modname + " (Mod)";
+		}
 	}
 }

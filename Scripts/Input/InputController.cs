@@ -67,7 +67,6 @@ public class InputController : MonoHelper
 		isLeftClicking = false;
 		isRightClicking = false;
 		isMiddleClicking = false;
-		KeyBinds.ResetKeyPresses();
 		mousePos = GetMousePosition();
 	}
 
@@ -88,7 +87,6 @@ public class InputController : MonoHelper
 
 	private void CheckForKeyboardInput()
 	{
-		KeyBinds.CheckKeysDown();
 		if (Globals.gameIsOver)
 		{
 			if (Input.anyKeyDown || Input.touchCount > 0)
@@ -101,15 +99,7 @@ public class InputController : MonoHelper
 			}
 			return;
 		}
-		if (KeyBinds.GetAction(InputAction.Left))
-		{
-			moveDirection = -1;
-		}
-		else if (KeyBinds.GetAction(InputAction.Right))
-		{
-			moveDirection = 1;
-		}
-		else if (touchCount > 0)
+		if (touchCount > 0)
 		{
 			isLeftClicking = true;
 			float width = Screen.width / 2;
@@ -126,22 +116,6 @@ public class InputController : MonoHelper
 				{
 					moveDirection = -1;
 				}
-			}
-		}
-		isJumping = KeyBinds.GetAction(InputAction.Jump);
-		if (KeyBinds.GetActionDown(InputAction.Console))
-		{
-			DebugConsole.IsOpen = !DebugConsole.IsOpen;
-		}
-		if (KeyBinds.GetActionDown(InputAction.Pause))
-		{
-			if (Globals.GameIsPaused())
-			{
-				Globals.OpenPauseMenu();
-			}
-			else
-			{
-				Globals.ClosePauseMenu();
 			}
 		}
 	}

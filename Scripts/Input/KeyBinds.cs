@@ -1,21 +1,26 @@
-﻿using JSONSystem;
+﻿using Commands;
+using JSONSystem;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum InputAction
-{
-	Left,
-	Right,
-	Jump,
-	Console,
-	Pause
-}
-
 public static class KeyBinds
 {
-	private static Dictionary<KeyCode, InputAction> keysPressed;
-	private static Dictionary<InputAction, bool> actionsToPerform;
-	private static Dictionary<InputAction, bool> actionsPressedDown;
+	private static Dictionary<KeyCode, InputCommand> keysPressed
+	{
+		get
+		{
+			if (_keysPressed == null)
+			{
+				InitializeDictionaries();
+			}
+			return _keysPressed;
+		}
+		set
+		{
+			_keysPressed = value;
+		}
+	}
+	private static Dictionary<KeyCode, InputCommand> _keysPressed;
 
 	private static void InitializeDictionaries()
 	{
@@ -25,44 +30,39 @@ public static class KeyBinds
 			rawJSON = GetDefaultBindings();
 		}
 		JSONClass bindings = JSONSystem.JSON.Parse(rawJSON).AsObject;
-		keysPressed = new Dictionary<KeyCode, InputAction>();
-		actionsToPerform = new Dictionary<InputAction, bool>();
-		actionsPressedDown = new Dictionary<InputAction, bool>();
+		keysPressed = new Dictionary<KeyCode, InputCommand>();
 		for (int i = 0; i < bindings.Count; i++)
 		{
 			string keyStr = bindings.GetKey(i);
 			string actionStr = bindings[i];
 			KeyCode key = (KeyCode)System.Enum.Parse(typeof(KeyCode), keyStr, true);
-			InputAction action = (InputAction)System.Enum.Parse(typeof(InputAction), actionStr, true);
-			keysPressed.Add(key, action);
-			if (!actionsToPerform.ContainsKey(action))
-			{
-				actionsToPerform.Add(action, false);
-				actionsPressedDown.Add(action, false);
-			}
+			InputCommand action = Command.FromString(actionStr) as InputCommand;
+			BindKey(action, key);
 		}
 	}
 
 	private static string GetDefaultBindings()
 	{
 		JSONClass bindings = new JSONClass();
-		bindings.Add("d", new JSONData("Right"));
-		bindings.Add("a", new JSONData("Left"));
-		bindings.Add("rightarrow", new JSONData("Right"));
-		bindings.Add("leftarrow", new JSONData("Left"));
-		bindings.Add("uparrow", new JSONData("Jump"));
-		bindings.Add("space", new JSONData("Jump"));
-		bindings.Add("backquote", new JSONData("Console"));
-		bindings.Add("escape", new JSONData("Pause"));
+		KeyCode[] keys = Globals.instance.keys;
+		Command[] actions = Globals.instance.actions;
+		for (int i = 0; i < keys.Length; i++)
+		{
+			bindings.Add(keys[i].ToString().ToLower(), new JSONData(actions[i].ToString()));
+		}
 		return bindings.ToString();
 	}
 
-	public static void BindKey(InputAction a, KeyCode k)
+	/// <summary>
+	/// Binds a key to active an InputCommand and saves it to PlayerPrefs.
+	/// Note that it will not save to PlayerPrefs if the build is a debug build.
+	/// </summary>
+	/// <param name="a">The command to bind.</param>
+	/// <param name="k">The key to bind the command to.</param>
+	public static void BindKey(InputCommand a, KeyCode k)
 	{
-		if (keysPressed == null)
-		{
-			InitializeDictionaries();
-		}
+		Console.Log("Binding " + k + " to " + a);
+		a.keyPress = k;
 		if (keysPressed.ContainsKey(k))
 		{
 			keysPressed[k] = a;
@@ -72,70 +72,35 @@ public static class KeyBinds
 			keysPressed.Add(k, a);
 		}
 		JSONClass bindings = new JSONClass();
-		foreach (KeyValuePair<KeyCode, InputAction> kvp in keysPressed)
+		foreach (KeyValuePair<KeyCode, InputCommand> kvp in keysPressed)
 		{
 			bindings.Add(kvp.Key.ToString(), new JSONData(kvp.Value.ToString()));
 		}
-		PlayerPrefs.SetString("bindings", bindings.ToString());
-		PlayerPrefs.Save();
+		if (!Debug.isDebugBuild)
+		{
+			PlayerPrefs.SetString("bindings", bindings.ToString());
+			PlayerPrefs.Save();
+		}
 	}
 
-	public static void CheckKeysDown()
+	public static void CheckKeysDown(MonoBehaviour actor)
 	{
-		if (keysPressed == null)
-		{
-			InitializeDictionaries();
-		}
-		Dictionary<InputAction, bool> newActions = actionsToPerform;
-		Dictionary<InputAction, bool> newActionsDown = actionsPressedDown;
-		foreach (KeyValuePair<KeyCode, InputAction> kvp in keysPressed)
+		foreach (KeyValuePair<KeyCode, InputCommand> kvp in keysPressed)
 		{
 			KeyCode key = kvp.Key;
-			if (Input.GetKey(key))
-			{
-				newActions[kvp.Value] = true;
-			}
+			InputCommand value = kvp.Value;
 			if (Input.GetKeyDown(key))
 			{
-				newActionsDown[kvp.Value] = true;
+				value.ExecuteButtonDown(actor);
+			}
+			else if (Input.GetKeyUp(key))
+			{
+				value.ExecuteButtonUp(actor);
+			}
+			if (Input.GetKey(key))
+			{
+				value.Execute(actor);
 			}
 		}
-		actionsToPerform = newActions;
-		actionsPressedDown = newActionsDown;
-	}
-
-	public static bool GetAction(InputAction action)
-	{
-		if (actionsToPerform == null)
-		{
-			InitializeDictionaries();
-		}
-		return actionsToPerform[action];
-	}
-
-	public static bool GetActionDown(InputAction action)
-	{
-		if (actionsPressedDown == null)
-		{
-			InitializeDictionaries();
-		}
-		return actionsPressedDown[action];
-	}
-
-	public static void ResetKeyPresses()
-	{
-		if (keysPressed == null)
-		{
-			InitializeDictionaries();
-		}
-		Dictionary<InputAction, bool> newActions = new Dictionary<InputAction, bool>();
-		Dictionary<InputAction, bool> newActionsDown = new Dictionary<InputAction, bool>();
-		foreach (KeyValuePair<InputAction, bool> kvp in actionsToPerform)
-		{
-			newActions.Add(kvp.Key, false);
-			newActionsDown.Add(kvp.Key, false);
-		}
-		actionsToPerform = newActions;
-		actionsPressedDown = newActionsDown;
 	}
 }

@@ -8,6 +8,7 @@ namespace LuaSystem
 	{
 		protected LuaBinding()
 		{
+			/* EMPTY */
 		}
 		public LuaBinding(string binding)
 		{
