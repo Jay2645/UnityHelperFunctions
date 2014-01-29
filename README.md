@@ -32,6 +32,12 @@ A replacement console that disables itself when you shift from debug to release 
 
 A way to keep track of objects across loads and even after the user closes and re-opens the game. Classes found in the `Hash` folder.
 
+## Character Motors
+
+Uses a [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine) along with the Command Pattern to process movements for characters. Input from an AI or the user's keyboard/controller is processed into an `InputCommand`, which then asks the character in question's `CharacterMotor` to change state. The `CharacterMotor` asks the state if it is possible to change. If not, the entire process is aborted. If so, the `CharacterController` gives the `InputCommand` the okay and the Command executes whatever logic is necessary.
+
+`InputCommand` can also be extended even for behavior which does not require a `CharacterMotor` -- opening the pause menu, for instance.
+
 ## Various Helper Classes
 
 An uncategorized array of helpful classes. Among them are:
