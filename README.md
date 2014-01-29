@@ -18,7 +18,7 @@ An easy way to make objects clickable. Additionally allows for behaviors like ha
 
 ## Command Pattern
 
-*Partially implemented:* An implementation of the [Command Pattern](http://en.wikipedia.org/wiki/Command_pattern). Allows for delayed execution of actions and an easy way to undo/redo actions. Base classes found in the `Commands` folder.
+*Partially implemented:* An implementation of the [Command Pattern](http://en.wikipedia.org/wiki/Command_pattern). Allows for delayed execution of actions and an easy way to undo/redo actions. `InputCommand` also allows for actions to be executed on key press (opening a pause menu, for isntance). Base classes found in the `Commands` folder.
 
 ## Global Constants
 
@@ -34,9 +34,7 @@ A way to keep track of objects across loads and even after the user closes and r
 
 ## Character Motors
 
-Uses a [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine) along with the Command Pattern to process movements for characters. Input from an AI or the user's keyboard/controller is processed into an `InputCommand`, which then asks the character in question's `CharacterMotor` to change state. The `CharacterMotor` asks the state if it is possible to change. If not, the entire process is aborted. If so, the `CharacterController` gives the `InputCommand` the okay and the Command executes whatever logic is necessary.
-
-`InputCommand` can also be extended even for behavior which does not require a `CharacterMotor` -- opening the pause menu, for instance.
+Uses a [finite state machine](http://en.wikipedia.org/wiki/Finite-state_machine) along with the Command Pattern to process movements for characters. Input from an AI or the user's keyboard/controller is processed into an `MotorCommand`, which then asks the character in question's `CharacterMotor` to change state. The `CharacterMotor` asks the state if it is possible to change. If not, the entire process is aborted. If so, the `CharacterController` gives the `MotorCommand` the okay and the Command executes whatever logic is necessary.
 
 ## Various Helper Classes
 
