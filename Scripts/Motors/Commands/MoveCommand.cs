@@ -4,13 +4,8 @@ namespace Commands
 	/// <summary>
 	/// An abstract class to make a character move.
 	/// </summary>
-	public abstract class MoveCommand : InputCommand
+	public abstract class MoveCommand : MotorCommand
 	{
-		protected CharacterMotor GetMotor(UnityEngine.MonoBehaviour source)
-		{
-			return source.GetComponentInChildren<CharacterMotor>();
-		}
-
 		protected override void OnExecute(UnityEngine.MonoBehaviour actor)
 		{
 			CharacterMotor motor = GetMotor(actor);
