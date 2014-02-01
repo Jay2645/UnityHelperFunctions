@@ -1,4 +1,6 @@
 ﻿using System;
+namespace HelperFunctions
+{
 namespace Hashing
 {
 	public class HashCollisionException : Exception
@@ -19,4 +21,5 @@ namespace Hashing
 
 		public string hash = "";
 	}
+}
 }

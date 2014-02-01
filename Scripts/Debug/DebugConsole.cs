@@ -31,6 +31,7 @@
 * IMPLIED WARRANTIES OF MERCHANTABILITY AND ALL IMPLIED WARRANTIES OF
 * FITNESS FOR A PARTICULAR PURPOSE.
 * ************************************************************************/
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -133,6 +134,9 @@ using UnityEngine;
 /// If you subclass WatchVarBase, you can create your own WatchVars to represent more types than are currently built-in.
 /// </summary>
 ///
+
+namespace HelperFunctions
+{
 #if DEBUG_CONSOLE
 public class DebugConsole : MonoBehaviour
 {
@@ -1349,6 +1353,7 @@ public class FPSCounter
 			yield return null;
 		}
 	}
+}
 }
 
 namespace UnityEngine

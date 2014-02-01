@@ -1,24 +1,27 @@
-﻿namespace ObserverSystem
+﻿namespace HelperFunctions
 {
-	public class MonoObserver : Observer
+	namespace ObserverSystem
 	{
-		public MonoObserver(MonoHelper monoHelper)
+		public class MonoObserver : Observer
 		{
-			helper = monoHelper;
-		}
-		private MonoHelper helper;
-		public override void OnNotify(UnityEngine.MonoBehaviour entity, string eventType)
-		{
-			helper.OnNotify(entity, eventType);
-		}
-
-		public override string ToString()
-		{
-			if (helper == null)
+			public MonoObserver(MonoHelper monoHelper)
 			{
-				return base.ToString();
+				helper = monoHelper;
 			}
-			return "MonoObserver (" + helper.ToString() + ")";
+			private MonoHelper helper;
+			public override void OnNotify(UnityEngine.MonoBehaviour entity, string eventType)
+			{
+				helper.OnNotify(entity, eventType);
+			}
+
+			public override string ToString()
+			{
+				if (helper == null)
+				{
+					return base.ToString();
+				}
+				return "MonoObserver (" + helper.ToString() + ")";
+			}
 		}
 	}
 }

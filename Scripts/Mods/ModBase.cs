@@ -1,122 +1,125 @@
 ﻿using System.Collections.Generic;
-namespace ModSystem
+namespace HelperFunctions
 {
-	public partial class Mod
+	namespace ModSystem
 	{
-		public Mod(string name)
+		public partial class Mod
 		{
-			modname = name;
-		}
-		public string modname;
-
-		// These are all the "actual" things the mods will load
-		// If a player disables something, it is removed from the list
-		private List<string> scripts = new List<string>();
-		private List<string> sprites = new List<string>();
-
-		// These all hold everything the mod can possibly load
-		// Even things that are disabled remain in here
-		private List<string> fullScripts = new List<string>();
-		private List<string> fullSprites = new List<string>();
-
-		private string MakeFilename(string input)
-		{
-			return "/GameData/" + modname + "/" + input;
-		}
-
-		public string RemoveFilename(string input)
-		{
-			input = input.Replace(GlobalConsts.GetDataPath(), "");
-			return input.Replace("/GameData/" + modname + "/", "");
-		}
-
-		private void AddToList(string filename, List<string> primary, List<string> full)
-		{
-			filename = MakeFilename(filename);
-			primary.Add(filename);
-			if (!full.Contains(filename))
+			public Mod(string name)
 			{
-				full.Add(filename);
+				modname = name;
 			}
-		}
+			public string modname;
 
-		private void RemoveFromList(string filename, List<string> list)
-		{
-			// Make sure that the given filename matches what we have in the list
-			filename = RemoveFilename(filename); // Removes any extra bits before the filename, i.e. C:/Blah/Blah/Blah
-			filename = MakeFilename(filename); // Puts the stuff that the list would contain back in
-			if (list.Contains(filename))
+			// These are all the "actual" things the mods will load
+			// If a player disables something, it is removed from the list
+			private List<string> scripts = new List<string>();
+			private List<string> sprites = new List<string>();
+
+			// These all hold everything the mod can possibly load
+			// Even things that are disabled remain in here
+			private List<string> fullScripts = new List<string>();
+			private List<string> fullSprites = new List<string>();
+
+			private string MakeFilename(string input)
 			{
-				list.Remove(filename);
-				return;
+				return "/GameData/" + modname + "/" + input;
 			}
-			// Have yet to find it, so now we isolate the file in question
-			filename = System.IO.Path.GetFileNameWithoutExtension(filename);
-			for (int i = 0; i < list.Count; i++)
+
+			public string RemoveFilename(string input)
 			{
-				string listFile = System.IO.Path.GetFileNameWithoutExtension(list[i]);
-				if (filename == listFile)
+				input = input.Replace(GlobalConsts.GetDataPath(), "");
+				return input.Replace("/GameData/" + modname + "/", "");
+			}
+
+			private void AddToList(string filename, List<string> primary, List<string> full)
+			{
+				filename = MakeFilename(filename);
+				primary.Add(filename);
+				if (!full.Contains(filename))
 				{
-					list.RemoveAt(i);
+					full.Add(filename);
+				}
+			}
+
+			private void RemoveFromList(string filename, List<string> list)
+			{
+				// Make sure that the given filename matches what we have in the list
+				filename = RemoveFilename(filename); // Removes any extra bits before the filename, i.e. C:/Blah/Blah/Blah
+				filename = MakeFilename(filename); // Puts the stuff that the list would contain back in
+				if (list.Contains(filename))
+				{
+					list.Remove(filename);
 					return;
 				}
-			}
-			Console.LogError(new LocalizedString(GlobalConsts.ID_ERROR_COULD_NOT_FIND_IN_MOD, "Could not find %s in %s!", new object[] { filename, modname }));
-		}
-
-		public void AddScript(string filename)
-		{
-			AddToList(filename, scripts, fullScripts);
-		}
-		public void AddSprite(string filename)
-		{
-			AddToList(filename, sprites, fullSprites);
-		}
-
-		public List<string> GetScripts()
-		{
-			return scripts;
-		}
-		public List<string> GetSprites()
-		{
-			return sprites;
-		}
-
-		public void DisableScript(string filename)
-		{
-			RemoveFromList(filename, scripts);
-		}
-		public void DisableSprite(string filename)
-		{
-			RemoveFromList(filename, sprites);
-		}
-
-		private bool WillLoad(string filename, List<string> list)
-		{
-			filename = System.IO.Path.GetFileNameWithoutExtension(filename);
-			for (int i = 0; i < list.Count; i++)
-			{
-				string listFile = System.IO.Path.GetFileNameWithoutExtension(list[i]);
-				if (listFile == filename)
+				// Have yet to find it, so now we isolate the file in question
+				filename = System.IO.Path.GetFileNameWithoutExtension(filename);
+				for (int i = 0; i < list.Count; i++)
 				{
-					return true;
+					string listFile = System.IO.Path.GetFileNameWithoutExtension(list[i]);
+					if (filename == listFile)
+					{
+						list.RemoveAt(i);
+						return;
+					}
 				}
+				Console.LogError(new LocalizedString(GlobalConsts.ID_ERROR_COULD_NOT_FIND_IN_MOD, "Could not find %s in %s!", new object[] { filename, modname }));
 			}
-			return false;
-		}
 
-		public bool WillLoadScript(string filename)
-		{
-			return WillLoad(filename, scripts);
-		}
-		public bool WillLoadSprite(string filename)
-		{
-			return WillLoad(filename, sprites);
-		}
+			public void AddScript(string filename)
+			{
+				AddToList(filename, scripts, fullScripts);
+			}
+			public void AddSprite(string filename)
+			{
+				AddToList(filename, sprites, fullSprites);
+			}
 
-		public override string ToString()
-		{
-			return modname + " (Mod)";
+			public List<string> GetScripts()
+			{
+				return scripts;
+			}
+			public List<string> GetSprites()
+			{
+				return sprites;
+			}
+
+			public void DisableScript(string filename)
+			{
+				RemoveFromList(filename, scripts);
+			}
+			public void DisableSprite(string filename)
+			{
+				RemoveFromList(filename, sprites);
+			}
+
+			private bool WillLoad(string filename, List<string> list)
+			{
+				filename = System.IO.Path.GetFileNameWithoutExtension(filename);
+				for (int i = 0; i < list.Count; i++)
+				{
+					string listFile = System.IO.Path.GetFileNameWithoutExtension(list[i]);
+					if (listFile == filename)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
+
+			public bool WillLoadScript(string filename)
+			{
+				return WillLoad(filename, scripts);
+			}
+			public bool WillLoadSprite(string filename)
+			{
+				return WillLoad(filename, sprites);
+			}
+
+			public override string ToString()
+			{
+				return modname + " (Mod)";
+			}
 		}
 	}
 }

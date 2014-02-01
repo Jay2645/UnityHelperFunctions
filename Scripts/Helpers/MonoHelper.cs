@@ -1,223 +1,227 @@
-﻿using Hashing;
-using Instancing;
-using JSONSystem;
-using ObserverSystem;
+﻿using HelperFunctions.Hashing;
+using HelperFunctions.Instancing;
+using HelperFunctions.JSONSystem;
+using HelperFunctions.ObserverSystem;
 using UnityEngine;
 
-/// <summary>
-/// An extension of the default MonoBehaviour, the MonoHelper class aids in identifying GameObjects across scenes and between loads.
-/// It also provides any helper or utility methods which apply to all MonoBehaviours.
-/// </summary>
-public class MonoHelper : MonoBehaviour
+namespace HelperFunctions
 {
-	// Subject
-	private MonoSubject subject
+
+	/// <summary>
+	/// An extension of the default MonoBehaviour, the MonoHelper class aids in identifying GameObjects across scenes and between loads.
+	/// It also provides any helper or utility methods which apply to all MonoBehaviours.
+	/// </summary>
+	public class MonoHelper : MonoBehaviour
 	{
-		get
+		// Subject
+		private MonoSubject subject
 		{
-			// Lazy instancing.
-			if (_subject == null)
+			get
 			{
-				_subject = new MonoSubject(this);
+				// Lazy instancing.
+				if (_subject == null)
+				{
+					_subject = new MonoSubject(this);
+				}
+				return _subject;
 			}
-			return _subject;
 		}
-	}
-	private MonoSubject _subject = null;
+		private MonoSubject _subject = null;
 
-	// Hash
-	private MonoHash hash
-	{
-		get
+		// Hash
+		private MonoHash hash
 		{
-			if (_hash == null)
+			get
 			{
-				_hash = new MonoHash(this);
+				if (_hash == null)
+				{
+					_hash = new MonoHash(this);
+				}
+				return _hash;
 			}
-			return _hash;
 		}
-	}
-	private MonoHash _hash = null;
-	public string monoID
-	{
-		get
+		private MonoHash _hash = null;
+		public string monoID
 		{
-			return hash.monoID;
-		}
-	}
-
-	// Instancing
-	private ObjectLoader loader
-	{
-		get
-		{
-			if (_loader == null)
+			get
 			{
-				_loader = new ObjectLoader();
+				return hash.monoID;
 			}
-			return _loader;
 		}
-	}
-	private ObjectLoader _loader = null;
 
-	// JSON
-	private MonoJSON json
-	{
-		get
+		// Instancing
+		private ObjectLoader loader
 		{
-			if (_json == null)
+			get
 			{
-				_json = new MonoJSON(this);
+				if (_loader == null)
+				{
+					_loader = new ObjectLoader();
+				}
+				return _loader;
 			}
-			return _json;
 		}
-	}
-	private MonoJSON _json = null;
+		private ObjectLoader _loader = null;
 
-	public MonoObserver thisObserver
-	{
-		get
+		// JSON
+		private MonoJSON json
 		{
-			return subject.thisObserver;
+			get
+			{
+				if (_json == null)
+				{
+					_json = new MonoJSON(this);
+				}
+				return _json;
+			}
 		}
-	}
+		private MonoJSON _json = null;
 
-	public void SetName(string newName)
-	{
-		hash.SetName(newName);
-	}
+		public MonoObserver thisObserver
+		{
+			get
+			{
+				return subject.thisObserver;
+			}
+		}
 
-	protected virtual void Start()
-	{
-		SetName(name);
-	}
+		public void SetName(string newName)
+		{
+			hash.SetName(newName);
+		}
 
-	public static Object Load(Vector3 location, string path)
-	{
-		return ObjectLoader.Load(location, path);
-	}
+		protected virtual void Start()
+		{
+			SetName(name);
+		}
 
-	public static Object Load(Transform parent, Vector3 localPosition, string path)
-	{
-		return ObjectLoader.Load(parent, localPosition, path);
-	}
+		public static Object Load(Vector3 location, string path)
+		{
+			return ObjectLoader.Load(location, path);
+		}
 
-	public static Object Load(string path, Vector3 location, MonoHelper instance)
-	{
-		return ObjectLoader.Load(path, location, instance);
-	}
+		public static Object Load(Transform parent, Vector3 localPosition, string path)
+		{
+			return ObjectLoader.Load(parent, localPosition, path);
+		}
 
-	public static Object Load(string path, Transform parent, Vector3 localPosition, MonoHelper instance)
-	{
-		return ObjectLoader.Load(path, parent, localPosition, instance);
-	}
+		public static Object Load(string path, Vector3 location, MonoHelper instance)
+		{
+			return ObjectLoader.Load(path, location, instance);
+		}
 
-	public Object Load(string path, Transform parent, Vector3 localPosition)
-	{
-		return loader.Load(path, parent, localPosition);
-	}
+		public static Object Load(string path, Transform parent, Vector3 localPosition, MonoHelper instance)
+		{
+			return ObjectLoader.Load(path, parent, localPosition, instance);
+		}
 
-	public Object Load(string path, Transform parent, Vector3 localPosition, string newName)
-	{
-		return loader.Load(path, parent, localPosition, newName);
-	}
+		public Object Load(string path, Transform parent, Vector3 localPosition)
+		{
+			return loader.Load(path, parent, localPosition);
+		}
 
-	public Object Load(string path, Vector3 location)
-	{
-		return loader.Load(path, location);
-	}
+		public Object Load(string path, Transform parent, Vector3 localPosition, string newName)
+		{
+			return loader.Load(path, parent, localPosition, newName);
+		}
 
-	public Object Load(string path, Vector3 location, string newName)
-	{
-		return loader.Load(path, location, newName);
-	}
+		public Object Load(string path, Vector3 location)
+		{
+			return loader.Load(path, location);
+		}
 
-	public void DontDestroy()
-	{
-		ObjectLoader.DontDestroy(gameObject);
-	}
+		public Object Load(string path, Vector3 location, string newName)
+		{
+			return loader.Load(path, location, newName);
+		}
 
-	protected virtual void OnDestroy()
-	{
-		hash.CleanUp();
-	}
+		public void DontDestroy()
+		{
+			ObjectLoader.DontDestroy(gameObject);
+		}
 
-	public void LoadFromCache(CachedPrefab cachedGO)
-	{
-		json.LoadFromCache(cachedGO);
-	}
+		protected virtual void OnDestroy()
+		{
+			hash.CleanUp();
+		}
 
-	public virtual JSONClass ToJSON()
-	{
-		return json.ToJSON();
-	}
+		public void LoadFromCache(CachedPrefab cachedGO)
+		{
+			json.LoadFromCache(cachedGO);
+		}
 
-	public virtual void FromJSON(JSONClass json)
-	{
-		this.json.FromJSON(json);
-	}
+		public virtual JSONClass ToJSON()
+		{
+			return json.ToJSON();
+		}
 
-	public void Notify(MonoBehaviour entity, string eventType)
-	{
-		subject.Notify(entity, eventType);
-	}
+		public virtual void FromJSON(JSONClass json)
+		{
+			this.json.FromJSON(json);
+		}
 
-	public void Notify(MonoBehaviour entity, string eventType, bool notifyAchievements)
-	{
-		subject.Notify(entity, eventType, notifyAchievements);
-	}
+		public void Notify(MonoBehaviour entity, string eventType)
+		{
+			subject.Notify(entity, eventType);
+		}
 
-	public void AddObserver(Observer[] os)
-	{
-		subject.AddObserver(os);
-	}
+		public void Notify(MonoBehaviour entity, string eventType, bool notifyAchievements)
+		{
+			subject.Notify(entity, eventType, notifyAchievements);
+		}
 
-	public void AddObserver(Observer o)
-	{
-		subject.AddObserver(o);
-	}
+		public void AddObserver(Observer[] os)
+		{
+			subject.AddObserver(os);
+		}
 
-	public void RemoveObserver(Observer o)
-	{
-		subject.RemoveObserver(o);
-	}
+		public void AddObserver(Observer o)
+		{
+			subject.AddObserver(o);
+		}
 
-	public virtual void OnNotify(MonoBehaviour entity, string eventType)
-	{
-	}
+		public void RemoveObserver(Observer o)
+		{
+			subject.RemoveObserver(o);
+		}
 
-	public MonoHash GetHash()
-	{
-		return hash;
-	}
+		public virtual void OnNotify(MonoBehaviour entity, string eventType)
+		{
+		}
 
-	public static JSONClass ToJSON(MonoHelper helper)
-	{
-		return MonoJSON.ToJSON(helper);
-	}
+		public MonoHash GetHash()
+		{
+			return hash;
+		}
 
-	protected static JSONClass GetFields(MonoHelper source)
-	{
-		return MonoJSON.GetFields(source);
-	}
+		public static JSONClass ToJSON(MonoHelper helper)
+		{
+			return MonoJSON.ToJSON(helper);
+		}
 
-	protected static JSONClass GetFields(MonoHelper source, JSONClass fieldArray)
-	{
-		return MonoJSON.GetFields(source, fieldArray);
-	}
+		protected static JSONClass GetFields(MonoHelper source)
+		{
+			return MonoJSON.GetFields(source);
+		}
 
-	public static MonoHelper GetMonoHelper(GameObject go)
-	{
-		return MonoHash.GetMonoHelper(go);
-	}
+		protected static JSONClass GetFields(MonoHelper source, JSONClass fieldArray)
+		{
+			return MonoJSON.GetFields(source, fieldArray);
+		}
 
-	public static MonoHelper GetMonoHelper(string hash)
-	{
-		return MonoHash.GetMonoHelper(hash);
-	}
+		public static MonoHelper GetMonoHelper(GameObject go)
+		{
+			return MonoHash.GetMonoHelper(go);
+		}
 
-	public static void AddToLoadingQueue(MonoHelper helper)
-	{
-		ObjectLoader.AddToLoadingQueue(helper);
+		public static MonoHelper GetMonoHelper(string hash)
+		{
+			return MonoHash.GetMonoHelper(hash);
+		}
+
+		public static void AddToLoadingQueue(MonoHelper helper)
+		{
+			ObjectLoader.AddToLoadingQueue(helper);
+		}
 	}
 }

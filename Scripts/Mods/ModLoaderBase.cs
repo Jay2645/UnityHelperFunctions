@@ -1,186 +1,188 @@
-﻿using JSONSystem;
+﻿using HelperFunctions.JSONSystem;
 using System.Collections.Generic;
 using System.IO;
-
-namespace ModSystem
+namespace HelperFunctions
 {
-	public static partial class ModLoader
+	namespace ModSystem
 	{
-		/// <summary>
-		/// Gets all custom fields from JSON for your mod. See LoadModJSON().
-		/// </summary>
-		static partial void LoadGameModJSON(JSONNode output, Mod m);
-		/// <summary>
-		/// Overwrites the custom fields in your mod based on the load order. See SortMods().
-		/// </summary>
-		static partial void SortGameMods();
-
-		private static string dataDirectory;
-		private static bool loadedMods = false;
-		private static Mod[] mods;
-
-		public static void LoadMods()
+		public static partial class ModLoader
 		{
-			if (loadedMods)
-			{
-				return;
-			}
-			dataDirectory = GlobalConsts.GetDataPath() + "/GameData/";
-			string[] modDirectories = Directory.GetDirectories(dataDirectory);
+			/// <summary>
+			/// Gets all custom fields from JSON for your mod. See LoadModJSON().
+			/// </summary>
+			static partial void LoadGameModJSON(JSONNode output, Mod m);
+			/// <summary>
+			/// Overwrites the custom fields in your mod based on the load order. See SortMods().
+			/// </summary>
+			static partial void SortGameMods();
 
-			// Load JSON.
-			LoadModJSON(modDirectories);
+			private static string dataDirectory;
+			private static bool loadedMods = false;
+			private static Mod[] mods;
 
-			// Re-organize the mod list to put the base game at the top
-			List<Mod> modList = new List<Mod>(mods);
-			int count = 1;
-			foreach (Mod m in modList)
+			public static void LoadMods()
 			{
-				// Load base game mod first, then anything else overwrites base game
-				if (m.modname == GlobalConsts.GAME_BASE_MOD_NAME)
+				if (loadedMods)
 				{
-					mods[0] = m;
+					return;
 				}
-				else
+				dataDirectory = GlobalConsts.GetDataPath() + "/GameData/";
+				string[] modDirectories = Directory.GetDirectories(dataDirectory);
+
+				// Load JSON.
+				LoadModJSON(modDirectories);
+
+				// Re-organize the mod list to put the base game at the top
+				List<Mod> modList = new List<Mod>(mods);
+				int count = 1;
+				foreach (Mod m in modList)
 				{
-					if (count == modList.Count && mods[0] == null)
+					// Load base game mod first, then anything else overwrites base game
+					if (m.modname == GlobalConsts.GAME_BASE_MOD_NAME)
 					{
-						count = 0;
+						mods[0] = m;
 					}
-					mods[count] = m;
-					count++;
-				}
-			}
-
-			SortMods();
-
-			loadedMods = true;
-		}
-
-		private static void LoadModJSON(string[] modDirectories)
-		{
-			foreach (string modName in modDirectories)
-			{
-				if (new DirectoryInfo(modName).Name == "Localization")
-				{
-					continue;
-				}
-				Mod m = new Mod(new DirectoryInfo(modName).Name);
-				string jsonFilename = modName + "/modinfo.json";
-				string rawJSON = JSONSystem.JSON.GetRawJSONFromFile(jsonFilename);
-				JSONNode output = JSONSystem.JSON.Parse(rawJSON);
-
-				JSONArray scripts = output["scripts"].AsArray;
-				foreach (JSONNode node in scripts)
-				{
-					m.AddScript(node);
-				}
-
-				JSONArray sprites = output["sprites"].AsArray;
-				foreach (JSONNode node in sprites)
-				{
-					m.AddSprite(node);
-				}
-				LoadGameModJSON(output, m);
-				AddMod(m);
-			}
-		}
-
-		private static void SortMods()
-		{
-			// This forces later-loaded mods to overwrite what is loaded in earlier mods.
-			for (int i = 0; i < mods.Length; i++)
-			{
-				Mod m = mods[i];
-				for (int j = i - 1; j >= 0; j--)
-				{
-					Mod old = mods[j];
-					foreach (string s in m.GetScripts())
+					else
 					{
-						if (old.WillLoadScript(s))
+						if (count == modList.Count && mods[0] == null)
 						{
-							old.DisableScript(s);
+							count = 0;
+						}
+						mods[count] = m;
+						count++;
+					}
+				}
+
+				SortMods();
+
+				loadedMods = true;
+			}
+
+			private static void LoadModJSON(string[] modDirectories)
+			{
+				foreach (string modName in modDirectories)
+				{
+					if (new DirectoryInfo(modName).Name == "Localization")
+					{
+						continue;
+					}
+					Mod m = new Mod(new DirectoryInfo(modName).Name);
+					string jsonFilename = modName + "/modinfo.json";
+					string rawJSON = JSONSystem.JSON.GetRawJSONFromFile(jsonFilename);
+					JSONNode output = JSONSystem.JSON.Parse(rawJSON);
+
+					JSONArray scripts = output["scripts"].AsArray;
+					foreach (JSONNode node in scripts)
+					{
+						m.AddScript(node);
+					}
+
+					JSONArray sprites = output["sprites"].AsArray;
+					foreach (JSONNode node in sprites)
+					{
+						m.AddSprite(node);
+					}
+					LoadGameModJSON(output, m);
+					AddMod(m);
+				}
+			}
+
+			private static void SortMods()
+			{
+				// This forces later-loaded mods to overwrite what is loaded in earlier mods.
+				for (int i = 0; i < mods.Length; i++)
+				{
+					Mod m = mods[i];
+					for (int j = i - 1; j >= 0; j--)
+					{
+						Mod old = mods[j];
+						foreach (string s in m.GetScripts())
+						{
+							if (old.WillLoadScript(s))
+							{
+								old.DisableScript(s);
+							}
+						}
+						foreach (string s in m.GetSprites())
+						{
+							if (old.WillLoadSprite(s))
+							{
+								old.DisableSprite(s);
+							}
 						}
 					}
-					foreach (string s in m.GetSprites())
+				}
+				// Do the same with any other custom fields in the mod.
+				SortGameMods();
+			}
+
+			private static void AddMod(Mod m)
+			{
+				if (mods == null)
+				{
+					mods = new Mod[0];
+				}
+				List<Mod> modList = new List<Mod>(mods);
+				modList.Add(m);
+				mods = modList.ToArray();
+			}
+
+			public static Mod[] GetMods()
+			{
+				if (mods.Length == 0)
+				{
+					LoadMods();
+				}
+				return mods;
+			}
+
+			public static string[] GetLoadOrder()
+			{
+				string[] loadOrder = new string[mods.Length];
+				for (int i = 0; i < mods.Length; i++)
+				{
+					loadOrder[i] = mods[i].modname;
+				}
+				return loadOrder;
+			}
+
+			public static void SetLoadOrder(string[] newOrder)
+			{
+				Mod[] newModOrder = new Mod[mods.Length];
+				for (int i = 0; i < newOrder.Length; i++)
+				{
+					Mod newM = null;
+					foreach (Mod m in mods)
 					{
-						if (old.WillLoadSprite(s))
+						if (m.modname == newOrder[i])
 						{
-							old.DisableSprite(s);
+							newM = m;
+							break;
 						}
 					}
+					newModOrder[i] = newM;
 				}
+				mods = newModOrder;
 			}
-			// Do the same with any other custom fields in the mod.
-			SortGameMods();
-		}
 
-		private static void AddMod(Mod m)
-		{
-			if (mods == null)
+			public static string[] GetScripts()
 			{
-				mods = new Mod[0];
-			}
-			List<Mod> modList = new List<Mod>(mods);
-			modList.Add(m);
-			mods = modList.ToArray();
-		}
-
-		public static Mod[] GetMods()
-		{
-			if (mods.Length == 0)
-			{
-				LoadMods();
-			}
-			return mods;
-		}
-
-		public static string[] GetLoadOrder()
-		{
-			string[] loadOrder = new string[mods.Length];
-			for (int i = 0; i < mods.Length; i++)
-			{
-				loadOrder[i] = mods[i].modname;
-			}
-			return loadOrder;
-		}
-
-		public static void SetLoadOrder(string[] newOrder)
-		{
-			Mod[] newModOrder = new Mod[mods.Length];
-			for (int i = 0; i < newOrder.Length; i++)
-			{
-				Mod newM = null;
-				foreach (Mod m in mods)
+				List<string> output = new List<string>();
+				foreach (Mod m in GetMods())
 				{
-					if (m.modname == newOrder[i])
-					{
-						newM = m;
-						break;
-					}
+					output.AddRange(m.GetScripts());
 				}
-				newModOrder[i] = newM;
+				return output.ToArray();
 			}
-			mods = newModOrder;
-		}
-
-		public static string[] GetScripts()
-		{
-			List<string> output = new List<string>();
-			foreach (Mod m in GetMods())
+			public static string[] GetSprites()
 			{
-				output.AddRange(m.GetScripts());
+				List<string> output = new List<string>();
+				foreach (Mod m in GetMods())
+				{
+					output.AddRange(m.GetSprites());
+				}
+				return output.ToArray();
 			}
-			return output.ToArray();
-		}
-		public static string[] GetSprites()
-		{
-			List<string> output = new List<string>();
-			foreach (Mod m in GetMods())
-			{
-				output.AddRange(m.GetSprites());
-			}
-			return output.ToArray();
 		}
 	}
 }

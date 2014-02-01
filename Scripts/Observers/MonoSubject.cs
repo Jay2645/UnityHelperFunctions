@@ -1,35 +1,34 @@
-﻿
-/// <summary>
-/// 
-/// </summary>
-namespace ObserverSystem
+﻿namespace HelperFunctions
 {
-	public class MonoSubject : Subject
+	namespace ObserverSystem
 	{
-		public MonoSubject(MonoHelper mHelper)
+		public class MonoSubject : Subject
 		{
-			helper = mHelper;
-			AddConstantObservers();
-		}
-		private MonoHelper helper = null;
-		public MonoObserver thisObserver = null;
-
-		/// <summary>
-		/// This adds any Observer classes which are used by ALL MonoSubjects.
-		/// </summary>
-		private void AddConstantObservers()
-		{
-			if (thisObserver != null)
+			public MonoSubject(MonoHelper mHelper)
 			{
-				return;
+				helper = mHelper;
+				AddConstantObservers();
 			}
-			thisObserver = new MonoObserver(helper);
-			AddObserver(thisObserver);
-		}
+			private MonoHelper helper = null;
+			public MonoObserver thisObserver = null;
 
-		public MonoObserver GetObserver()
-		{
-			return thisObserver;
+			/// <summary>
+			/// This adds any Observer classes which are used by ALL MonoSubjects.
+			/// </summary>
+			private void AddConstantObservers()
+			{
+				if (thisObserver != null)
+				{
+					return;
+				}
+				thisObserver = new MonoObserver(helper);
+				AddObserver(thisObserver);
+			}
+
+			public MonoObserver GetObserver()
+			{
+				return thisObserver;
+			}
 		}
 	}
 }

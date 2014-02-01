@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+namespace HelperFunctions
+{
 namespace AudioSystem
 {
 	/// <summary>
@@ -24,4 +26,5 @@ namespace AudioSystem
 		}
 		#endregion
 	}
+}
 }

@@ -1,129 +1,132 @@
-﻿using Hashing;
-using SaveSystem;
+﻿using HelperFunctions.Hashing;
+using HelperFunctions.SaveSystem;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace JSONSystem
+namespace HelperFunctions
 {
-	public class MonoJSON
+	namespace JSONSystem
 	{
-		public MonoJSON(MonoHelper mHelper)
+		public class MonoJSON
 		{
-			helper = mHelper;
-		}
-		private MonoHelper helper = null;
-
-		public void LoadFromCache(Instancing.CachedPrefab cachedGO)
-		{
-			MonoHash hash = helper.GetHash();
-			hash.fullPosHash = cachedGO.hash;
-			MonoHash.AddToHashLookup(hash, helper);
-			helper.transform.position = cachedGO.position;
-			helper.transform.localScale = cachedGO.scale;
-			helper.transform.rotation = Quaternion.Euler(cachedGO.rotation);
-			JSONClass components = cachedGO.components;
-			for (int i = 0; i < components.Count; i++)
+			public MonoJSON(MonoHelper mHelper)
 			{
-				System.Type key = System.Type.GetType(components.GetKey(i));
-				if (key == null)
-				{
-					Console.LogWarning("Could not find key " + components.GetKey(i) + " in " + helper.name + ".");
-					continue;
-				}
-				MonoHelper component = helper.GetComponentInChildren(key) as MonoHelper;
-				if (component == null)
-				{
-					Console.LogWarning("Could not find component " + components.GetKey(i) + " in " + helper.name + ".");
-					continue;
-				}
-				component.FromJSON(components[i].AsObject);
+				helper = mHelper;
 			}
-		}
+			private MonoHelper helper = null;
 
-		public virtual JSONClass ToJSON()
-		{
-			// Checks to see if this is a base MonoHelper class
-			if (!helper.GetType().IsSubclassOf(typeof(MonoHelper)))
+			public void LoadFromCache(Instancing.CachedPrefab cachedGO)
 			{
-				return null;
-			}
-			return ToJSON(helper);
-		}
-
-		public static JSONClass ToJSON(MonoHelper helper)
-		{
-			JSONClass componentData = new JSONClass();
-			componentData.Add("hash", new JSONData(helper.monoID));
-			componentData.Add("fields", GetFields(helper));
-			return componentData;
-		}
-
-		public virtual void FromJSON(JSONClass json)
-		{
-			MonoHash hash = helper.GetHash();
-			hash.fullPosHash = json["hash"];
-			System.Type t = GetType();
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
-									BindingFlags.Static | BindingFlags.Instance |
-									BindingFlags.FlattenHierarchy;
-			FieldInfo[] fields = t.GetFields(flags);
-			FieldInfo[] badFieldArray = typeof(MonoHelper).GetFields(flags);
-			List<string> badFields = new List<string>();
-			foreach (FieldInfo field in badFieldArray)
-			{
-				badFields.Add(field.Name);
-			}
-			JSONClass fieldJSON = json["fields"].AsObject;
-			foreach (FieldInfo field in fields)
-			{
-				string fieldName = field.Name;
-				if (badFields.Contains(fieldName) || System.Attribute.IsDefined(field, typeof(DontSave)))
+				MonoHash hash = helper.GetHash();
+				hash.fullPosHash = cachedGO.hash;
+				MonoHash.AddToHashLookup(hash, helper);
+				helper.transform.position = cachedGO.position;
+				helper.transform.localScale = cachedGO.scale;
+				helper.transform.rotation = Quaternion.Euler(cachedGO.rotation);
+				JSONClass components = cachedGO.components;
+				for (int i = 0; i < components.Count; i++)
 				{
-					continue;
+					System.Type key = System.Type.GetType(components.GetKey(i));
+					if (key == null)
+					{
+						Console.LogWarning("Could not find key " + components.GetKey(i) + " in " + helper.name + ".");
+						continue;
+					}
+					MonoHelper component = helper.GetComponentInChildren(key) as MonoHelper;
+					if (component == null)
+					{
+						Console.LogWarning("Could not find component " + components.GetKey(i) + " in " + helper.name + ".");
+						continue;
+					}
+					component.FromJSON(components[i].AsObject);
 				}
-				SaveGame.LoadField(fieldJSON[fieldName].AsObject, field, helper);
 			}
-		}
 
-		public static JSONClass GetFields(MonoHelper source)
-		{
-			return GetFields(source, new JSONClass());
-		}
+			public virtual JSONClass ToJSON()
+			{
+				// Checks to see if this is a base MonoHelper class
+				if (!helper.GetType().IsSubclassOf(typeof(MonoHelper)))
+				{
+					return null;
+				}
+				return ToJSON(helper);
+			}
 
-		public static JSONClass GetFields(MonoHelper source, JSONClass fieldArray)
-		{
-			System.Type t = source.GetType();
-			BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
-									BindingFlags.Static | BindingFlags.Instance |
-									BindingFlags.FlattenHierarchy;
-			FieldInfo[] fields = t.GetFields(flags);
-			FieldInfo[] badFieldArray = typeof(MonoHelper).GetFields(flags);
-			List<string> badFields = new List<string>();
-			foreach (FieldInfo field in badFieldArray)
+			public static JSONClass ToJSON(MonoHelper helper)
 			{
-				badFields.Add(field.Name);
+				JSONClass componentData = new JSONClass();
+				componentData.Add("hash", new JSONData(helper.monoID));
+				componentData.Add("fields", GetFields(helper));
+				return componentData;
 			}
-			foreach (FieldInfo field in fields)
+
+			public virtual void FromJSON(JSONClass json)
 			{
-				object fieldObj = field.GetValue(source);
-				if (fieldObj == null)
+				MonoHash hash = helper.GetHash();
+				hash.fullPosHash = json["hash"];
+				System.Type t = GetType();
+				BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+										BindingFlags.Static | BindingFlags.Instance |
+										BindingFlags.FlattenHierarchy;
+				FieldInfo[] fields = t.GetFields(flags);
+				FieldInfo[] badFieldArray = typeof(MonoHelper).GetFields(flags);
+				List<string> badFields = new List<string>();
+				foreach (FieldInfo field in badFieldArray)
 				{
-					continue;
+					badFields.Add(field.Name);
 				}
-				string fieldName = field.Name;
-				if (badFields.Contains(fieldName) || System.Attribute.IsDefined(field, typeof(DontSave)))
+				JSONClass fieldJSON = json["fields"].AsObject;
+				foreach (FieldInfo field in fields)
 				{
-					continue;
+					string fieldName = field.Name;
+					if (badFields.Contains(fieldName) || System.Attribute.IsDefined(field, typeof(DontSave)))
+					{
+						continue;
+					}
+					SaveGame.LoadField(fieldJSON[fieldName].AsObject, field, helper);
 				}
-				JSONClass fieldData = SaveGame.SaveField(fieldObj, fieldName);
-				if (fieldData == null)
-				{
-					continue;
-				}
-				fieldArray.Add(fieldName, fieldData);
 			}
-			return fieldArray;
+
+			public static JSONClass GetFields(MonoHelper source)
+			{
+				return GetFields(source, new JSONClass());
+			}
+
+			public static JSONClass GetFields(MonoHelper source, JSONClass fieldArray)
+			{
+				System.Type t = source.GetType();
+				BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+										BindingFlags.Static | BindingFlags.Instance |
+										BindingFlags.FlattenHierarchy;
+				FieldInfo[] fields = t.GetFields(flags);
+				FieldInfo[] badFieldArray = typeof(MonoHelper).GetFields(flags);
+				List<string> badFields = new List<string>();
+				foreach (FieldInfo field in badFieldArray)
+				{
+					badFields.Add(field.Name);
+				}
+				foreach (FieldInfo field in fields)
+				{
+					object fieldObj = field.GetValue(source);
+					if (fieldObj == null)
+					{
+						continue;
+					}
+					string fieldName = field.Name;
+					if (badFields.Contains(fieldName) || System.Attribute.IsDefined(field, typeof(DontSave)))
+					{
+						continue;
+					}
+					JSONClass fieldData = SaveGame.SaveField(fieldObj, fieldName);
+					if (fieldData == null)
+					{
+						continue;
+					}
+					fieldArray.Add(fieldName, fieldData);
+				}
+				return fieldArray;
+			}
 		}
 	}
 }

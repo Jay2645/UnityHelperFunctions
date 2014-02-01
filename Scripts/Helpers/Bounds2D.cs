@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-
+namespace HelperFunctions
+{
 public class Bounds2D
 {
 	public Bounds2D(Collider2D source)
@@ -113,4 +114,5 @@ public class Bounds2D
 	{
 		return GetCenter() + extents;
 	}
+}
 }

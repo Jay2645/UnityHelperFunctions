@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+namespace HelperFunctions
+{
 namespace AudioSystem
 {
 	/// <summary>
@@ -131,4 +133,5 @@ namespace AudioSystem
 		}
 		#endregion
 	}
+}
 }

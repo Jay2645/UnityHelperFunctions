@@ -1,73 +1,75 @@
-﻿using JSONSystem;
+﻿using HelperFunctions.JSONSystem;
 using UnityEngine;
-
-namespace Localization
+namespace HelperFunctions
 {
-	public enum CurrentLanguage
+	namespace Localization
 	{
-		English
-	}
-
-	public static class LocalizationSystem
-	{
-		private static JSONClass localizedStrings;
-		private static bool loadedLocalization = false;
-		private static CurrentLanguage language;
-
-		private static void LoadLocalization()
+		public enum CurrentLanguage
 		{
-			string currentLanguage = PlayerPrefs.GetString("language", "English");
-			language = (CurrentLanguage)System.Enum.Parse(typeof(CurrentLanguage), currentLanguage, true);
-			string fileName = GlobalConsts.GetDataPath() + "/GameData/Localization/" + language.ToString() + ".json";
-			if (!System.IO.File.Exists(fileName))
+			English
+		}
+
+		public static class LocalizationSystem
+		{
+			private static JSONClass localizedStrings;
+			private static bool loadedLocalization = false;
+			private static CurrentLanguage language;
+
+			private static void LoadLocalization()
 			{
-				fileName = GlobalConsts.GetDataPath() + "/GameData/Localization/English.json";
+				string currentLanguage = PlayerPrefs.GetString("language", "English");
+				language = (CurrentLanguage)System.Enum.Parse(typeof(CurrentLanguage), currentLanguage, true);
+				string fileName = GlobalConsts.GetDataPath() + "/GameData/Localization/" + language.ToString() + ".json";
 				if (!System.IO.File.Exists(fileName))
 				{
-					System.IO.File.WriteAllText(fileName, "{}");
+					fileName = GlobalConsts.GetDataPath() + "/GameData/Localization/English.json";
+					if (!System.IO.File.Exists(fileName))
+					{
+						System.IO.File.WriteAllText(fileName, "{}");
+					}
 				}
+				string rawJSON = JSONSystem.JSON.GetRawJSONFromFile(fileName);
+				localizedStrings = JSONSystem.JSON.Parse(rawJSON) as JSONClass;
 			}
-			string rawJSON = JSONSystem.JSON.GetRawJSONFromFile(fileName);
-			localizedStrings = JSONSystem.JSON.Parse(rawJSON) as JSONClass;
-		}
 
-		public static string GetText(string id)
-		{
-			if (localizedStrings == null && !loadedLocalization)
+			public static string GetText(string id)
 			{
-				LoadLocalization();
-				loadedLocalization = true;
+				if (localizedStrings == null && !loadedLocalization)
+				{
+					LoadLocalization();
+					loadedLocalization = true;
+				}
+				else if (localizedStrings == null)
+				{
+					return id;
+				}
+				string output = localizedStrings[id];
+				if (output == null || output == "")
+				{
+					output = id;
+				}
+				return output;
 			}
-			else if (localizedStrings == null)
-			{
-				return id;
-			}
-			string output = localizedStrings[id];
-			if (output == null || output == "")
-			{
-				output = id;
-			}
-			return output;
-		}
 
-		public static void SetText(string id, string value)
-		{
-			if (language == CurrentLanguage.English)
+			public static void SetText(string id, string value)
 			{
-				if (localizedStrings["id"] == null)
+				if (language == CurrentLanguage.English)
 				{
-					localizedStrings.Add(id, new JSONData(value));
+					if (localizedStrings["id"] == null)
+					{
+						localizedStrings.Add(id, new JSONData(value));
+					}
+					else
+					{
+						localizedStrings[id] = value;
+					}
+					string fileName = GlobalConsts.GetDataPath() + "/GameData/Localization/English.json";
+					if (System.IO.File.Exists(fileName))
+					{
+						System.IO.File.Delete(fileName);
+					}
+					System.IO.File.WriteAllText(fileName, localizedStrings.ToString("\n"));
 				}
-				else
-				{
-					localizedStrings[id] = value;
-				}
-				string fileName = GlobalConsts.GetDataPath() + "/GameData/Localization/English.json";
-				if (System.IO.File.Exists(fileName))
-				{
-					System.IO.File.Delete(fileName);
-				}
-				System.IO.File.WriteAllText(fileName, localizedStrings.ToString("\n"));
 			}
 		}
 	}

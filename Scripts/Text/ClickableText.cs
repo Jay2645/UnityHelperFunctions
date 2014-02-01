@@ -1,107 +1,110 @@
 ﻿using UnityEngine;
-namespace Clickable
+namespace HelperFunctions
 {
-	namespace Text
+	namespace Clickable
 	{
-		public class ClickableText : ClickableObject
+		namespace Text
 		{
-			private DisplayText text;
-			private string textID = "";
-			public GameObject displayParent;
-			private const float BOUNDS_BORDER = 0.5f;
-			protected Color startColor;
-
-			void Awake()
+			public class ClickableText : ClickableObject
 			{
-				text = gameObject.GetComponent<DisplayText>();
-				if (text == null)
+				private DisplayText text;
+				private string textID = "";
+				public GameObject displayParent;
+				private const float BOUNDS_BORDER = 0.5f;
+				protected Color startColor;
+
+				void Awake()
 				{
-					text = gameObject.AddComponent<DisplayText>();
+					text = gameObject.GetComponent<DisplayText>();
+					if (text == null)
+					{
+						text = gameObject.AddComponent<DisplayText>();
+					}
+					SetDisplayParent(displayParent);
+					useBounds = false;
+					startColor = renderer.material.color;
 				}
-				SetDisplayParent(displayParent);
-				useBounds = false;
-				startColor = renderer.material.color;
-			}
 
-			protected override void LateUpdate()
-			{
-				if (mouseOver)
+				protected override void LateUpdate()
 				{
-					currentColor = Color.Lerp(currentColor, hoverColor, Time.deltaTime * 5);
+					if (mouseOver)
+					{
+						currentColor = Color.Lerp(currentColor, hoverColor, Time.deltaTime * 5);
+					}
+					else
+					{
+						currentColor = Color.Lerp(currentColor, Color.white, Time.deltaTime * 5);
+					}
+					renderer.material.color = currentColor;
 				}
-				else
+
+				protected override void LeftClicked()
 				{
-					currentColor = Color.Lerp(currentColor, Color.white, Time.deltaTime * 5);
+					if (displayParent != null && MessageBox.isOpen)
+					{
+						MessageBox.ChooseResponse(this, textID);
+					}
 				}
-				renderer.material.color = currentColor;
-			}
 
-			protected override void LeftClicked()
-			{
-				if (displayParent != null && MessageBox.isOpen)
+				public void SetMaxBounds(Bounds bounds)
 				{
-					MessageBox.ChooseResponse(this, textID);
+					float width = bounds.size.x - BOUNDS_BORDER;
+					float height = bounds.size.y - BOUNDS_BORDER;
+					text.SetMaxBounds(width, height);
 				}
-			}
 
-			public void SetMaxBounds(Bounds bounds)
-			{
-				float width = bounds.size.x - BOUNDS_BORDER;
-				float height = bounds.size.y - BOUNDS_BORDER;
-				text.SetMaxBounds(width, height);
-			}
-
-			public void SetMaxWidth(float width)
-			{
-				text.maxWidth = width;
-				text.SetMaxBounds(width, text.maxHeight);
-			}
-
-			public void SetMaxHeight(float height)
-			{
-				text.maxHeight = height;
-				text.SetMaxBounds(text.maxWidth, height);
-			}
-
-			public void SetDisplayParent(GameObject parent)
-			{
-				if (parent == null)
+				public void SetMaxWidth(float width)
 				{
-					return;
+					text.maxWidth = width;
+					text.SetMaxBounds(width, text.maxHeight);
 				}
-				displayParent = parent;
-				text.displayParent = parent;
-				SetMaxBounds(displayParent.renderer.bounds);
-			}
 
-			public void SetTextString(LocalizedString newString)
-			{
-				text.SetTextString(newString);
-				textID = newString.ID;
-				if (textID == "")
+				public void SetMaxHeight(float height)
 				{
-					textID = newString.Text;
+					text.maxHeight = height;
+					text.SetMaxBounds(text.maxWidth, height);
 				}
-				SetName(newString + " Clickable Text");
-			}
 
-			public void Display(bool on)
-			{
-				if (!on)
+				public void SetDisplayParent(GameObject parent)
 				{
-					mouseOver = false;
+					if (parent == null)
+					{
+						return;
+					}
+					displayParent = parent;
+					text.displayParent = parent;
+					SetMaxBounds(displayParent.renderer.bounds);
 				}
-				text.Display(on);
-			}
 
-			public DisplayText GetDisplayText()
-			{
-				return text;
-			}
+				public void SetTextString(LocalizedString newString)
+				{
+					text.SetTextString(newString);
+					textID = newString.ID;
+					if (textID == "")
+					{
+						textID = newString.Text;
+					}
+					SetName(newString + " Clickable Text");
+				}
 
-			public void SetAnchor(TextAnchor anchor)
-			{
-				text.SetAnchor(anchor);
+				public void Display(bool on)
+				{
+					if (!on)
+					{
+						mouseOver = false;
+					}
+					text.Display(on);
+				}
+
+				public DisplayText GetDisplayText()
+				{
+					return text;
+				}
+
+				public void SetAnchor(TextAnchor anchor)
+				{
+					text.SetAnchor(anchor);
+				}
 			}
 		}
 	}

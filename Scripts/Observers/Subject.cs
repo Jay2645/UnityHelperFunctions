@@ -1,61 +1,64 @@
 ﻿using System.Collections.Generic;
-namespace ObserverSystem
+namespace HelperFunctions
 {
-	public class Subject
+	namespace ObserverSystem
 	{
-		/// <summary>
-		/// This is a list of Observer classes which will recieve Notify events from us.
-		/// </summary>
-		protected List<Observer> observerList = new List<Observer>();
-
-		public void Notify(UnityEngine.MonoBehaviour entity, string eventType)
+		public class Subject
 		{
-			Notify(entity, eventType, true);
-		}
+			/// <summary>
+			/// This is a list of Observer classes which will recieve Notify events from us.
+			/// </summary>
+			protected List<Observer> observerList = new List<Observer>();
 
-		public void Notify(UnityEngine.MonoBehaviour entity, string eventType, bool notifyAchievements)
-		{
-			List<Observer> allObservers = new List<Observer>();
-			foreach (Observer o in observerList)
+			public void Notify(UnityEngine.MonoBehaviour entity, string eventType)
 			{
-				if (o == null)
+				Notify(entity, eventType, true);
+			}
+
+			public void Notify(UnityEngine.MonoBehaviour entity, string eventType, bool notifyAchievements)
+			{
+				List<Observer> allObservers = new List<Observer>();
+				foreach (Observer o in observerList)
 				{
-					continue;
+					if (o == null)
+					{
+						continue;
+					}
+					allObservers.Add(o);
 				}
-				allObservers.Add(o);
+				observerList = allObservers;
+				foreach (Observer o in observerList)
+				{
+					o.OnNotify(entity, eventType);
+				}
+				if (notifyAchievements)
+				{
+					AchievementSystem.AchievementManager.instance.OnNotify(entity, eventType);
+				}
 			}
-			observerList = allObservers;
-			foreach (Observer o in observerList)
-			{
-				o.OnNotify(entity, eventType);
-			}
-			if (notifyAchievements)
-			{
-				AchievementSystem.AchievementManager.instance.OnNotify(entity, eventType);
-			}
-		}
 
-		public void AddObserver(Observer[] os)
-		{
-			foreach (Observer o in os)
+			public void AddObserver(Observer[] os)
 			{
-				AddObserver(o);
+				foreach (Observer o in os)
+				{
+					AddObserver(o);
+				}
 			}
-		}
 
-		public void AddObserver(Observer o)
-		{
-			if (!observerList.Contains(o))
+			public void AddObserver(Observer o)
 			{
-				observerList.Add(o);
+				if (!observerList.Contains(o))
+				{
+					observerList.Add(o);
+				}
 			}
-		}
 
-		public void RemoveObserver(Observer o)
-		{
-			if (observerList.Contains(o))
+			public void RemoveObserver(Observer o)
 			{
-				observerList.Remove(o);
+				if (observerList.Contains(o))
+				{
+					observerList.Remove(o);
+				}
 			}
 		}
 	}

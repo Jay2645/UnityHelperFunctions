@@ -1,4 +1,6 @@
-﻿public static partial class GlobalConsts
+﻿namespace HelperFunctions
+{
+public static partial class GlobalConsts
 {
 	/// <summary>
 	/// How long it takes to go in and out of a scene (plus loading times)
@@ -93,4 +95,5 @@
 	/// </summary>
 	public const string ID_ERROR_COULD_NOT_FIND_IN_MOD = "COULD_NOT_FIND_IN_MOD";
 	#endregion
+}
 }

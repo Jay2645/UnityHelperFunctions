@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace HelperFunctions
+{
 public class Console
 {
 	public static void Log(string message)
@@ -98,4 +100,5 @@ public class Console
 		return "Done.";
 	}
 	#endregion
+}
 }

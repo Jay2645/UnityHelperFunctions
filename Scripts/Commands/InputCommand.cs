@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+namespace HelperFunctions
+{
 namespace Commands
 {
 	/// <summary>
@@ -54,4 +56,5 @@ namespace Commands
 			return FromString(typeof(InputCommand).Namespace + "." + name.ToString()) as InputCommand;
 		}
 	}
+}
 }

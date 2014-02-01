@@ -1,59 +1,62 @@
 ﻿using UnityEngine;
-namespace Clickable
+namespace HelperFunctions
 {
-	namespace Text
+	namespace Clickable
 	{
-		namespace Menu
+		namespace Text
 		{
-			/// <summary>
-			/// Represents an option on an in-game menu.
-			/// </summary>
-			[RequireComponent(typeof(SpriteRenderer))]
-			public class MenuResponse : ClickableObject
+			namespace Menu
 			{
-
-				#region Variables
 				/// <summary>
-				/// The sprite which the user clicks on.
+				/// Represents an option on an in-game menu.
 				/// </summary>
-				protected SpriteRenderer loadSprite;
-				protected float timeSinceStartup = 0.0f;
-				public ParticleEmitter[] emitters;
-				#endregion
-
-				#region ClickableObject Methods
-				protected override void Start()
+				[RequireComponent(typeof(SpriteRenderer))]
+				public class MenuResponse : ClickableObject
 				{
-					base.Start();
-					useBounds = false;
-					loadSprite = gameObject.GetComponent<SpriteRenderer>();
-					nonHoverColor = Color.white;
-					currentColor = Color.white;
-					timeSinceStartup = Time.realtimeSinceStartup;
-				}
 
-				protected override void LateUpdate()
-				{
-					float deltaTime = Time.realtimeSinceStartup - timeSinceStartup;
-					if (mouseOver)
+					#region Variables
+					/// <summary>
+					/// The sprite which the user clicks on.
+					/// </summary>
+					protected SpriteRenderer loadSprite;
+					protected float timeSinceStartup = 0.0f;
+					public ParticleEmitter[] emitters;
+					#endregion
+
+					#region ClickableObject Methods
+					protected override void Start()
 					{
-						currentColor = Color.Lerp(currentColor, hoverColor, deltaTime * 5);
+						base.Start();
+						useBounds = false;
+						loadSprite = gameObject.GetComponent<SpriteRenderer>();
+						nonHoverColor = Color.white;
+						currentColor = Color.white;
+						timeSinceStartup = Time.realtimeSinceStartup;
 					}
-					else
+
+					protected override void LateUpdate()
 					{
-						currentColor = Color.Lerp(currentColor, nonHoverColor, deltaTime * 5);
-					}
-					loadSprite.color = currentColor;
-					if (emitters != null)
-					{
-						foreach (ParticleEmitter emit in emitters)
+						float deltaTime = Time.realtimeSinceStartup - timeSinceStartup;
+						if (mouseOver)
 						{
-							emit.emit = mouseOver;
+							currentColor = Color.Lerp(currentColor, hoverColor, deltaTime * 5);
 						}
+						else
+						{
+							currentColor = Color.Lerp(currentColor, nonHoverColor, deltaTime * 5);
+						}
+						loadSprite.color = currentColor;
+						if (emitters != null)
+						{
+							foreach (ParticleEmitter emit in emitters)
+							{
+								emit.emit = mouseOver;
+							}
+						}
+						timeSinceStartup = Time.realtimeSinceStartup;
 					}
-					timeSinceStartup = Time.realtimeSinceStartup;
+					#endregion
 				}
-				#endregion
 			}
 		}
 	}

@@ -1,14 +1,17 @@
-﻿using JSONSystem;
+﻿using HelperFunctions.JSONSystem;
 using UnityEngine;
-namespace Instancing
+namespace HelperFunctions
 {
-	public struct CachedPrefab
+	namespace Instancing
 	{
-		public string source;
-		public string hash;
-		public Vector3 position;
-		public Vector3 scale;
-		public Vector3 rotation;
-		public JSONClass components;
+		public struct CachedPrefab
+		{
+			public string source;
+			public string hash;
+			public Vector3 position;
+			public Vector3 scale;
+			public Vector3 rotation;
+			public JSONClass components;
+		}
 	}
 }

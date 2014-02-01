@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace HelperFunctions
+{
 namespace Clickable
 {
 	public class HoverDescription : ClickableObject
@@ -108,4 +110,5 @@ namespace Clickable
 			mesh.text = formattedDesc;
 		}
 	}
+}
 }

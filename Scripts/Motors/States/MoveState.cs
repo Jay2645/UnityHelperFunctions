@@ -1,4 +1,10 @@
-﻿public class MoveState : HorizontalState
+﻿namespace HelperFunctions
 {
-	/* EMPTY -- Put your own logic here! */
+	namespace CharacterStates
+	{
+		public class MoveState : HorizontalState
+		{
+			/* EMPTY -- Put your own logic here! */
+		}
+	}
 }

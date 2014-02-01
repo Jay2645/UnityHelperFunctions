@@ -1,9 +1,12 @@
-﻿namespace ObserverSystem
+﻿namespace HelperFunctions
 {
-	public class Observer
+	namespace ObserverSystem
 	{
-		public virtual void OnNotify(UnityEngine.MonoBehaviour entity, string eventType)
+		public class Observer
 		{
+			public virtual void OnNotify(UnityEngine.MonoBehaviour entity, string eventType)
+			{
+			}
 		}
 	}
 }

@@ -1,4 +1,10 @@
-﻿public abstract class EquipmentState : CharacterState
+﻿namespace HelperFunctions
 {
-	/* EMPTY */
+	namespace CharacterStates
+	{
+		public abstract class EquipmentState : CharacterState
+		{
+			/* EMPTY */
+		}
+	}
 }

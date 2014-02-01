@@ -1,10 +1,14 @@
-﻿namespace Commands
+﻿using HelperFunctions.Motors;
+namespace HelperFunctions
 {
-	public abstract class MotorCommand : InputCommand
+	namespace Commands
 	{
-		protected CharacterMotor GetMotor(UnityEngine.MonoBehaviour source)
+		public abstract class MotorCommand : InputCommand
 		{
-			return source.GetComponentInChildren<CharacterMotor>();
+			protected CharacterMotor GetMotor(UnityEngine.MonoBehaviour source)
+			{
+				return source.GetComponentInChildren<CharacterMotor>();
+			}
 		}
 	}
 }

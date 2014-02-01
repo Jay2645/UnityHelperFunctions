@@ -1,63 +1,67 @@
-﻿
-namespace Commands
+﻿using HelperFunctions.CharacterStates;
+using HelperFunctions.Motors;
+namespace HelperFunctions
 {
-	/// <summary>
-	/// An abstract class to make a character move.
-	/// </summary>
-	public abstract class MoveCommand : MotorCommand
+	namespace Commands
 	{
-		protected override void OnExecute(UnityEngine.MonoBehaviour actor)
+		/// <summary>
+		/// An abstract class to make a character move.
+		/// </summary>
+		public abstract class MoveCommand : MotorCommand
 		{
-			CharacterMotor motor = GetMotor(actor);
-			if (motor == null)
+			protected override void OnExecute(UnityEngine.MonoBehaviour actor)
 			{
-				return;
+				CharacterMotor motor = GetMotor(actor);
+				if (motor == null)
+				{
+					return;
+				}
+				if (motor.ChangeState(new MoveState()))
+				{
+					ExecuteMove(motor);
+				}
 			}
-			if (motor.ChangeState(new MoveState()))
-			{
-				ExecuteMove(motor);
-			}
+
+			/// <summary>
+			/// Performs logic to make a character move.
+			/// </summary>
+			/// <param name="motor">A character's CharacterMotor.</param>
+			protected abstract void ExecuteMove(CharacterMotor motor);
 		}
 
 		/// <summary>
-		/// Performs logic to make a character move.
+		/// A command that makes a character move left.
 		/// </summary>
-		/// <param name="motor">A character's CharacterMotor.</param>
-		protected abstract void ExecuteMove(CharacterMotor motor);
-	}
-
-	/// <summary>
-	/// A command that makes a character move left.
-	/// </summary>
-	public class MoveLeftCommand : MoveCommand
-	{
-		protected override void ExecuteMove(CharacterMotor motor)
+		public class MoveLeftCommand : MoveCommand
 		{
-			// Whatever logic moves your character left
+			protected override void ExecuteMove(CharacterMotor motor)
+			{
+				// Whatever logic moves your character left
+			}
 		}
-	}
 
-	public class MoveRightCommand : MoveCommand
-	{
-		protected override void ExecuteMove(CharacterMotor motor)
+		public class MoveRightCommand : MoveCommand
 		{
-			// Whatever logic moves your character right
+			protected override void ExecuteMove(CharacterMotor motor)
+			{
+				// Whatever logic moves your character right
+			}
 		}
-	}
 
-	public class MoveForwardCommand : MoveCommand
-	{
-		protected override void ExecuteMove(CharacterMotor motor)
+		public class MoveForwardCommand : MoveCommand
 		{
-			// Whatever logic moves your character forward
+			protected override void ExecuteMove(CharacterMotor motor)
+			{
+				// Whatever logic moves your character forward
+			}
 		}
-	}
 
-	public class MoveBackCommand : MoveCommand
-	{
-		protected override void ExecuteMove(CharacterMotor motor)
+		public class MoveBackCommand : MoveCommand
 		{
-			// Whatever logic moves your character back
+			protected override void ExecuteMove(CharacterMotor motor)
+			{
+				// Whatever logic moves your character back
+			}
 		}
 	}
 }

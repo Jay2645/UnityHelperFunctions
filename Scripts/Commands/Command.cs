@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+namespace HelperFunctions
+{
 namespace Commands
 {
 	public abstract class Command
@@ -60,4 +62,5 @@ namespace Commands
 			return System.Activator.CreateInstance(command) as Command;
 		}
 	}
+}
 }
