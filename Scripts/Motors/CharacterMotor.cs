@@ -1,4 +1,6 @@
-﻿
+﻿/// <summary>
+/// A class allowing a character to move, jump, and shoot.
+/// </summary>
 public class CharacterMotor : MonoHelper
 {
 	/// <summary>
@@ -56,7 +58,23 @@ public class CharacterMotor : MonoHelper
 	/// The "default" state. Used when both Horizontal and Vertical states are null.
 	/// Should normally be "standing," "idle," or some equivalent.
 	/// </summary>
-	private IdleState defaultState = new IdleState();
+	protected IdleState defaultState;
+	/// <summary>
+	/// Is this the player? If not, AI hooks in to determine states.
+	/// </summary>
+	public bool isPlayer = false;
+	/// <summary>
+	/// The move speed of this character.
+	/// </summary>
+	public float moveSpeed = 4.0f;
+	/// <summary>
+	/// The jump acceleration of this character.
+	/// </summary>
+	public float jumpSpeed = 4.0f;
+	/// <summary>
+	/// The Animators attached to this character.
+	/// </summary>
+	public UnityEngine.Animator[] animators;
 
 	/// <summary>
 	/// Will attempt to change this character's present HorizontalState to the specified state.
@@ -100,11 +118,11 @@ public class CharacterMotor : MonoHelper
 	/// <param name="thisState">The current state of the character.</param>
 	/// <param name="nextState">The state to attempt to change to.</param>
 	/// <returns>The state the character should be in.</returns>
-	protected CharacterState ChangeState(CharacterState thisState, CharacterState nextState)
+	protected virtual CharacterState ChangeState(CharacterState thisState, CharacterState nextState)
 	{
 		if (thisState != null)
 		{
-			if (!thisState.ChangeState(nextState))
+			if (!thisState.ChangeState(this, nextState))
 			{
 				return thisState;
 			}
@@ -120,9 +138,15 @@ public class CharacterMotor : MonoHelper
 	}
 
 	/// <summary>
-	/// Is this the player? If not, AI hooks in to determine states.
+	/// Returns false if any of the current states are preventing movement. Otherwise returns true.
 	/// </summary>
-	public bool isPlayer = false;
+	/// <returns>TRUE if we can move, else FALSE.</returns>
+	public bool CanMove()
+	{
+		return currentVerticalState != null && currentVerticalState.isImmobileState ||
+				currentHorizontalState != null && currentHorizontalState.isImmobileState ||
+				currentEquipmentState != null && currentEquipmentState.isImmobileState;
+	}
 
 	protected virtual void FixedUpdate()
 	{
@@ -151,6 +175,70 @@ public class CharacterMotor : MonoHelper
 		if (currentEquipmentState != null)
 		{
 			currentEquipmentState.Update(this);
+		}
+	}
+
+	/// <summary>
+	/// Changes the value of an animator to the specified boolean.
+	/// </summary>
+	/// <param name="animationName">The name of the animation parameter.</param>
+	/// <param name="value">The parameter.</param>
+	public void SetAnimation(string animationName, bool value)
+	{
+		if (animators == null)
+		{
+			return;
+		}
+		foreach (UnityEngine.Animator animatior in animators)
+		{
+			animatior.SetBool(animationName, value);
+		}
+	}
+	/// <summary>
+	/// Changes the value of an animator to the specified float.
+	/// </summary>
+	/// <param name="animationName">The name of the animation parameter.</param>
+	/// <param name="value">The parameter.</param>
+	public void SetAnimation(string animationName, float value)
+	{
+		if (animators == null)
+		{
+			return;
+		}
+		foreach (UnityEngine.Animator animatior in animators)
+		{
+			animatior.SetFloat(animationName, value);
+		}
+	}
+	/// <summary>
+	/// Changes the value of an animator to the specified int.
+	/// </summary>
+	/// <param name="animationName">The name of the animation parameter.</param>
+	/// <param name="value">The parameter.</param>
+	public void SetAnimation(string animationName, int value)
+	{
+		if (animators == null)
+		{
+			return;
+		}
+		foreach (UnityEngine.Animator animatior in animators)
+		{
+			animatior.SetInteger(animationName, value);
+		}
+	}
+	/// <summary>
+	/// Sets off a named animation that is connected to a trigger.
+	/// </summary>
+	/// <param name="triggerName">The name of the trigger.</param>
+	public void SetAnimation(string triggerName)
+	{
+		if (animators == null)
+		{
+			return;
+		}
+		foreach (UnityEngine.Animator animatior in animators)
+		{
+			animatior.SetTrigger(triggerName);
 		}
 	}
 }

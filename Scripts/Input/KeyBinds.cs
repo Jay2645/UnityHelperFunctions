@@ -45,7 +45,12 @@ public static class KeyBinds
 	{
 		JSONClass bindings = new JSONClass();
 		KeyCode[] keys = Globals.instance.keys;
-		Command[] actions = Globals.instance.actions;
+		InputCommandName[] actionNames = Globals.instance.actions;
+		InputCommand[] actions = new InputCommand[actionNames.Length];
+		for (int i = 0; i < actionNames.Length; i++)
+		{
+			actions[i] = InputCommand.FromEnum(actionNames[i]);
+		}
 		for (int i = 0; i < keys.Length; i++)
 		{
 			bindings.Add(keys[i].ToString().ToLower(), new JSONData(actions[i].ToString()));

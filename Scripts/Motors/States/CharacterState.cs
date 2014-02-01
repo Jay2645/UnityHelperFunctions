@@ -3,6 +3,12 @@
 public abstract class CharacterState : Observer
 {
 	/// <summary>
+	/// Used to mark whether this is an "immobile" state.
+	/// If so, the only thing that can change this state is transitioning to null or idle.
+	/// </summary>
+	public bool isImmobileState = false;
+
+	/// <summary>
 	/// Called when the target enters this state.
 	/// </summary>
 	/// <param name="target">A MonoHelper object referencing the character in question.</param>
@@ -17,8 +23,16 @@ public abstract class CharacterState : Observer
 	/// <param name="target">The target CharacterMotor.</param>
 	/// <param name="newState">The new state we are attempting to change to.</param>
 	/// <returns>TRUE if the change is possible, else FALSE.</returns>
-	public virtual bool ChangeState(CharacterState newState)
+	public virtual bool ChangeState(CharacterMotor target, CharacterState newState)
 	{
+		if (!target.CanMove())
+		{
+
+			if (newState != null && !(newState is IdleState))
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 

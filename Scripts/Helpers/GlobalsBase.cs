@@ -108,7 +108,7 @@ public partial class Globals : MonoHelper
 	/// </summary>
 	public static MonoHelper player = null;
 	public KeyCode[] keys;
-	public InputCommand[] actions;
+	public InputCommandName[] actions;
 	#endregion
 
 	#region Instance Methods
@@ -293,6 +293,88 @@ public partial class Globals : MonoHelper
 			Destroy(instance.gameObject);
 		}
 		gameIsOver = false;
+	}
+	#endregion
+
+	#region State Machines
+	public static bool SetPlayerVerticalState(VerticalState nextState)
+	{
+		if (player == null)
+		{
+			return false;
+		}
+		CharacterMotor motor = player.GetComponentInChildren<CharacterMotor>();
+		if (motor == null)
+		{
+			return false;
+		}
+		return motor.ChangeState(nextState);
+	}
+	public static bool SetPlayerHorizontalState(HorizontalState nextState)
+	{
+		if (player == null)
+		{
+			return false;
+		}
+		CharacterMotor motor = player.GetComponentInChildren<CharacterMotor>();
+		if (motor == null)
+		{
+			return false;
+		}
+		return motor.ChangeState(nextState);
+	}
+	public static bool SetPlayerEquipmentState(EquipmentState nextState)
+	{
+		if (player == null)
+		{
+			return false;
+		}
+		CharacterMotor motor = player.GetComponentInChildren<CharacterMotor>();
+		if (motor == null)
+		{
+			return false;
+		}
+		return motor.ChangeState(nextState);
+	}
+
+	public static VerticalState GetPlayerVerticalState()
+	{
+		if (player == null)
+		{
+			return null;
+		}
+		CharacterMotor motor = player.GetComponentInChildren<CharacterMotor>();
+		if (motor == null)
+		{
+			return null;
+		}
+		return motor.currentVerticalState;
+	}
+	public static HorizontalState GetPlayerHorizontalState()
+	{
+		if (player == null)
+		{
+			return null;
+		}
+		CharacterMotor motor = player.GetComponentInChildren<CharacterMotor>();
+		if (motor == null)
+		{
+			return null;
+		}
+		return motor.currentHorizontalState;
+	}
+	public static EquipmentState GetPlayerEquipmentState()
+	{
+		if (player == null)
+		{
+			return null;
+		}
+		CharacterMotor motor = player.GetComponentInChildren<CharacterMotor>();
+		if (motor == null)
+		{
+			return null;
+		}
+		return motor.currentEquipmentState;
 	}
 	#endregion
 
