@@ -16,7 +16,7 @@ namespace HelperFunctions
 				{
 					return;
 				}
-				if (motor.ChangeState(new MoveState()))
+				if (motor.ChangeState(GetCommandState() as HorizontalState))
 				{
 					ExecuteMove(motor);
 				}
@@ -34,6 +34,12 @@ namespace HelperFunctions
 		/// </summary>
 		public class MoveLeftCommand : MoveCommand
 		{
+			protected override CharacterState GetCommandState()
+			{
+				// if using a custom state, change it here.
+				return new MoveState();
+			}
+
 			protected override void ExecuteMove(CharacterMotor motor)
 			{
 				// Whatever logic moves your character left
@@ -42,6 +48,12 @@ namespace HelperFunctions
 
 		public class MoveRightCommand : MoveCommand
 		{
+			protected override CharacterState GetCommandState()
+			{
+				// if using a custom state, change it here.
+				return new MoveState();
+			}
+
 			protected override void ExecuteMove(CharacterMotor motor)
 			{
 				// Whatever logic moves your character right
@@ -50,6 +62,12 @@ namespace HelperFunctions
 
 		public class MoveForwardCommand : MoveCommand
 		{
+			protected override CharacterState GetCommandState()
+			{
+				// if using a custom state, change it here.
+				return new MoveState();
+			}
+
 			protected override void ExecuteMove(CharacterMotor motor)
 			{
 				// Whatever logic moves your character forward
@@ -58,6 +76,12 @@ namespace HelperFunctions
 
 		public class MoveBackCommand : MoveCommand
 		{
+			protected override CharacterState GetCommandState()
+			{
+				// if using a custom state, change it here.
+				return new MoveState();
+			}
+
 			protected override void ExecuteMove(CharacterMotor motor)
 			{
 				// Whatever logic moves your character back
