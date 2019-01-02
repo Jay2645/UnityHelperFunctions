@@ -1,5 +1,7 @@
 # Unity Helper Functions
 
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 A bunch of helper functions for Unity, written in C#. Note that this is a work in progress -- although most things have implementations, some only have a skeleton implementation. Full implementations and more complete code documentation will come later.
 
 Contained within:
